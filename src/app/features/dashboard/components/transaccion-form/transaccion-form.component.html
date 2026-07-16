@@ -1,0 +1,115 @@
+<section aria-labelledby="form-title" class="p-xs">
+  <form [formGroup]="transaccionForm" (ngSubmit)="onSubmit()" novalidate class="form-grid transaccion-form-wrapper">
+    
+    <div class="form-field--full text-body-sm text-on-surface-variant/70 mb-3 px-1">
+      Todos los campos son obligatorios. El secreto será cifrado localmente con criptografía de grado militar (AES-256) antes del envío.
+    </div>
+
+    <!-- Operación -->
+    <mat-form-field appearance="outline" class="form-field--full">
+      <mat-label>Operación</mat-label>
+      <input
+        matInput
+        id="operacion"
+        formControlName="operacion"
+        placeholder="Ej. Venta, Depósito Interbancario"
+        autocomplete="off"
+        aria-required="true"
+        [attr.aria-invalid]="operacionCtrl.invalid && operacionCtrl.touched"
+      />
+      <mat-icon matPrefix>description</mat-icon>
+      @if (operacionCtrl.hasError('required') && operacionCtrl.touched) {
+        <mat-error id="operacion-error">El campo Operación es requerido</mat-error>
+      } @else if (operacionCtrl.hasError('pattern') && operacionCtrl.touched) {
+        <mat-error id="operacion-error">Solo se permiten letras y espacios</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Importe + Secreto (2 columns on md+) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Importe</mat-label>
+      <input
+        matInput
+        id="importe"
+        formControlName="importe"
+        placeholder="0.00"
+        autocomplete="off"
+        inputmode="decimal"
+        aria-required="true"
+        [attr.aria-invalid]="importeCtrl.invalid && importeCtrl.touched"
+      />
+      <mat-icon matPrefix>attach_money</mat-icon>
+      @if (importeCtrl.hasError('required') && importeCtrl.touched) {
+        <mat-error id="importe-error">El importe es requerido</mat-error>
+      } @else if (importeCtrl.hasError('pattern') && importeCtrl.touched) {
+        <mat-error id="importe-error">Ingresa un número válido (ej. 100 o 100.50)</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Secreto</mat-label>
+      <input
+        matInput
+        id="secreto"
+        formControlName="secreto"
+        type="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        aria-required="true"
+        [attr.aria-invalid]="secretoCtrl.invalid && secretoCtrl.touched"
+      />
+      <mat-icon matPrefix>lock</mat-icon>
+      @if (secretoCtrl.hasError('required') && secretoCtrl.touched) {
+        <mat-error id="secreto-error">El secreto es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Cliente (full width) -->
+    <mat-form-field appearance="outline" class="form-field--full">
+      <mat-label>Cliente</mat-label>
+      <input
+        matInput
+        id="cliente"
+        formControlName="cliente"
+        placeholder="Nombre del cuentahabiente"
+        autocomplete="off"
+        aria-required="true"
+        [attr.aria-invalid]="clienteCtrl.invalid && clienteCtrl.touched"
+      />
+      <mat-icon matPrefix>person</mat-icon>
+      @if (clienteCtrl.hasError('required') && clienteCtrl.touched) {
+        <mat-error id="cliente-error">El nombre del cliente es requerido</mat-error>
+      } @else if (clienteCtrl.hasError('pattern') && clienteCtrl.touched) {
+        <mat-error id="cliente-error">Solo se permiten letras y espacios</mat-error>
+      } @else if (clienteCtrl.hasError('maxlength') && clienteCtrl.touched) {
+        <mat-error id="cliente-error">Máximo 100 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Submit -->
+    <div class="form-field--full">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        id="btn-submit-transaccion"
+        class="submit-btn"
+        [disabled]="transaccionForm.invalid || submitting()"
+        [attr.aria-busy]="submitting()"
+      >
+        @if (submitting()) {
+          <ng-container>
+            <mat-icon class="spin-icon">progress_activity</mat-icon>
+            Enviando...
+          </ng-container>
+        } @else {
+          <ng-container>
+            <mat-icon>send</mat-icon>
+            Enviar
+          </ng-container>
+        }
+      </button>
+    </div>
+
+  </form>
+</section>

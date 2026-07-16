@@ -1,6 +1,6 @@
 <app-header-component></app-header-component>
 <main class="max-w-container-max mx-auto px-gutter py-xl space-y-xl">
-    <!-- Section 1: Registrar Operación Card -->
+    <!-- Section 1: Registrar Operación -->
     <section class="flex justify-center" aria-labelledby="form-title">
         <div
             class="bg-white w-full max-w-[500px] rounded-xl shadow-lg border border-outline/20 overflow-hidden transition-all duration-300 hover:shadow-xl">
@@ -9,82 +9,7 @@
                     Registrar Operación
                 </h2>
             </div>
-            <div class="p-md">
-                <form class="space-y-sm" novalidate>
-                    <div class="space-y-2">
-                        <label class="text-label-caps font-label-caps text-on-surface-variant block font-medium"
-                            for="op-name">
-                            Operación
-                        </label>
-                        <div
-                            class="relative flex items-center bg-surface-container-low border border-outline-variant rounded-lg transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-                            <span
-                                class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60"
-                                aria-hidden="true">description</span>
-                            <input
-                                class="w-full bg-transparent border-none py-3 pl-11 pr-4 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
-                                id="op-name" placeholder="Ej. Depósito Interbancario" required type="text" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-sm">
-                        <div class="space-y-2">
-                            <label class="text-label-caps font-label-caps text-on-surface-variant block font-medium"
-                                for="op-amount">
-                                Importe
-                            </label>
-                            <div
-                                class="relative flex items-center bg-surface-container-low border border-outline-variant rounded-lg transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-                                <span
-                                    class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60"
-                                    aria-hidden="true">attach_money</span>
-                                <input
-                                    class="w-full bg-transparent border-none py-3 pl-11 pr-4 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
-                                    id="op-amount" placeholder="0.00" required type="number" />
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-label-caps font-label-caps text-on-surface-variant block font-medium"
-                                for="op-secret">
-                                Secreto
-                            </label>
-                            <div
-                                class="relative flex items-center bg-surface-container-low border border-outline-variant rounded-lg transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-                                <span
-                                    class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60"
-                                    aria-hidden="true">lock</span>
-                                <input
-                                    class="w-full bg-transparent border-none py-3 pl-11 pr-4 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
-                                    id="op-secret" placeholder="••••••••" required type="password" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-label-caps font-label-caps text-on-surface-variant block font-medium"
-                            for="op-client">
-                            Cliente
-                        </label>
-                        <div
-                            class="relative flex items-center bg-surface-container-low border border-outline-variant rounded-lg transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-                            <span
-                                class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60"
-                                aria-hidden="true">person</span>
-                            <input
-                                class="w-full bg-transparent border-none py-3 pl-11 pr-4 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
-                                id="op-client" placeholder="Nombre del cuentahabiente" required type="text" />
-                        </div>
-                    </div>
-
-                    <button
-                        class="w-full mt-md bg-primary hover:bg-primary/95 text-on-primary py-4 rounded-lg font-headline-md text-headline-md flex items-center justify-center gap-xs shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                        type="submit">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">send</span>
-                        Enviar
-                    </button>
-                </form>
-            </div>
+            <app-transaccion-form (transaccionCreada)="reloadTransacciones()" />
         </div>
     </section>
 
@@ -99,210 +24,126 @@
                     Visualización detallada de los últimos movimientos registrados.
                 </p>
             </div>
-            <div class="flex gap-xs w-full sm:w-auto">
-                <button
-                    class="flex-1 sm:flex-initial px-sm py-2 bg-white border border-outline-variant rounded-lg flex items-center justify-center gap-xs hover:bg-surface-container transition-colors cursor-pointer">
-                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">filter_list</span>
-                    Filtros
-                </button>
-                <button
-                    class="flex-1 sm:flex-initial px-sm py-2 bg-white border border-outline-variant rounded-lg flex items-center justify-center gap-xs hover:bg-surface-container transition-colors cursor-pointer">
-                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">download</span>
-                    Exportar
-                </button>
-            </div>
         </div>
 
-        <!-- TODO Material Table: Evaluar la migración de esta tabla nativa a <table mat-table> de Angular Material para simplificar la paginación, ordenamiento nativo y renderizado reactivo con DataSource -->
-        <div class="bg-white rounded-xl shadow-md border border-outline/20 overflow-hidden">
+        <!-- Angular Material Table: server-side pagination via httpResource -->
+        <div class="mat-table-wrapper rounded-xl shadow-md border border-outline/20 overflow-hidden bg-white">
+
+            <!-- Loading overlay -->
+            @if (transaccionesResource.isLoading()) {
+            <div class="flex items-center justify-center py-xl gap-sm text-on-surface-variant">
+                <mat-spinner diameter="28" />
+                <span class="text-body-lg">Cargando transacciones...</span>
+            </div>
+            }
+
+            <!-- Error state -->
+            @if (transaccionesResource.error()) {
+            <div class="flex items-center gap-sm py-xl px-md text-error" role="alert">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                <span class="text-body-lg font-medium">No se pudo cargar el historial. Intenta de nuevo.</span>
+            </div>
+            }
+
+            <!-- Table -->
+            @if (!transaccionesResource.isLoading()) {
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-surface-container-low border-b border-outline-variant text-left">
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                ID</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                Operación</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                Importe</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                Cliente</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                Referencia</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold">
-                                Estatus</th>
-                            <th
-                                class="px-md py-3.5 font-label-caps text-label-caps text-on-surface-variant font-semibold text-right">
-                                Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-surface-container">
-                        <!-- Row 1 -->
-                        <tr class="hover:bg-surface-container-lowest/50 transition-colors group">
-                            <td class="px-md py-4 font-data-mono text-data-mono text-on-surface-variant">2376</td>
-                            <td class="px-md py-4 font-body-lg text-body-lg font-medium text-on-surface">Transferencia
-                                Internacional</td>
-                            <td class="px-md py-4 font-bold text-primary">$1,250.00</td>
-                            <td class="px-md py-4 font-body-sm text-body-sm">Alejandro G.</td>
-                            <td class="px-md py-4 font-data-mono text-data-mono text-outline">262737</td>
-                            <td class="px-md py-4">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary/10 text-secondary font-label-caps text-[11px] font-semibold uppercase tracking-wider">
-                                    <span class="material-symbols-outlined text-[16px] mr-1"
-                                        aria-hidden="true">check_circle</span>
-                                    Aprobada
-                                </span>
-                            </td>
-                            <td class="px-md py-4 text-right">
-                                <button
-                                    class="text-error hover:bg-error/10 px-sm py-1.5 rounded-lg transition-all font-label-caps text-label-caps cursor-pointer">
-                                    Cancelar
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Row 2 -->
-                        <tr class="hover:bg-surface-container-lowest/50 transition-colors">
-                            <td class="px-md py-4 font-data-mono text-data-mono text-on-surface-variant">2375</td>
-                            <td class="px-md py-4 font-body-lg text-body-lg font-medium text-on-surface">Pago de
-                                Servicios</td>
-                            <td class="px-md py-4 font-bold text-primary">$45.00</td>
-                            <td class="px-md py-4 font-body-sm text-body-sm">Elena Valdéz</td>
-                            <td class="px-md py-4 font-data-mono text-data-mono text-outline">262736</td>
-                            <td class="px-md py-4">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary/10 text-secondary font-label-caps text-[11px] font-semibold uppercase tracking-wider">
-                                    <span class="material-symbols-outlined text-[16px] mr-1"
-                                        aria-hidden="true">check_circle</span>
-                                    Aprobada
-                                </span>
-                            </td>
-                            <td class="px-md py-4 text-right">
-                                <button
-                                    class="text-error hover:bg-error/10 px-sm py-1.5 rounded-lg transition-all font-label-caps text-label-caps cursor-pointer">
-                                    Cancelar
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Row 3 -->
-                        <tr class="hover:bg-surface-container-lowest/50 transition-colors">
-                            <td class="px-md py-4 font-data-mono text-data-mono text-on-surface-variant">2374</td>
-                            <td class="px-md py-4 font-body-lg text-body-lg font-medium text-on-surface">Retiro Cajero
-                            </td>
-                            <td class="px-md py-4 font-bold text-primary">$200.00</td>
-                            <td class="px-md py-4 font-body-sm text-body-sm">Caja General</td>
-                            <td class="px-md py-4 font-data-mono text-data-mono text-outline">262735</td>
-                            <td class="px-md py-4">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full bg-error/10 text-error font-label-caps text-[11px] font-semibold uppercase tracking-wider">
-                                    <span class="material-symbols-outlined text-[16px] mr-1"
-                                        aria-hidden="true">cancel</span>
-                                    Cancelada
-                                </span>
-                            </td>
-                            <td class="px-md py-4 text-right">
-                                <button
-                                    class="text-outline opacity-40 cursor-not-allowed px-sm py-1.5 font-label-caps text-label-caps"
-                                    disabled>
-                                    Cancelar
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Row 4 -->
-                        <tr class="hover:bg-surface-container-lowest/50 transition-colors">
-                            <td class="px-md py-4 font-data-mono text-data-mono text-on-surface-variant">2373</td>
-                            <td class="px-md py-4 font-body-lg text-body-lg font-medium text-on-surface">Abono Nómina
-                            </td>
-                            <td class="px-md py-4 font-bold text-primary">$3,500.00</td>
-                            <td class="px-md py-4 font-body-sm text-body-sm">Empresa X</td>
-                            <td class="px-md py-4 font-data-mono text-data-mono text-outline">262734</td>
-                            <td class="px-md py-4">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary/10 text-secondary font-label-caps text-[11px] font-semibold uppercase tracking-wider">
-                                    <span class="material-symbols-outlined text-[16px] mr-1"
-                                        aria-hidden="true">check_circle</span>
-                                    Aprobada
-                                </span>
-                            </td>
-                            <td class="px-md py-4 text-right">
-                                <button
-                                    class="text-error hover:bg-error/10 px-sm py-1.5 rounded-lg transition-all font-label-caps text-label-caps cursor-pointer">
-                                    Cancelar
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
+                <table mat-table [dataSource]="transacciones" class="w-full" aria-label="Historial de transacciones">
+                    <!-- ID column -->
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef>ID</th>
+                        <td mat-cell *matCellDef="let row"
+                            class="font-data-mono text-data-mono text-on-surface-variant">
+                            {{ row.id }}
+                        </td>
+                    </ng-container>
+
+                    <!-- Operación column -->
+                    <ng-container matColumnDef="operacion">
+                        <th mat-header-cell *matHeaderCellDef>Operación</th>
+                        <td mat-cell *matCellDef="let row" class="font-medium text-on-surface">
+                            {{ row.operacion }}
+                        </td>
+                    </ng-container>
+
+                    <!-- Importe column -->
+                    <ng-container matColumnDef="importe">
+                        <th mat-header-cell *matHeaderCellDef>Importe</th>
+                        <td mat-cell *matCellDef="let row" class="font-bold text-primary">
+                            ${{ row.importe }}
+                        </td>
+                    </ng-container>
+
+                    <!-- Cliente column -->
+                    <ng-container matColumnDef="cliente">
+                        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                        <td mat-cell *matCellDef="let row">{{ row.cliente }}</td>
+                    </ng-container>
+
+                    <!-- Referencia column -->
+                    <ng-container matColumnDef="referencia">
+                        <th mat-header-cell *matHeaderCellDef>Referencia</th>
+                        <td mat-cell *matCellDef="let row" class="font-data-mono text-data-mono text-outline">
+                            {{ row.referencia }}
+                        </td>
+                    </ng-container>
+
+                    <!-- Estatus column -->
+                    <ng-container matColumnDef="estatus">
+                        <th mat-header-cell *matHeaderCellDef>Estatus</th>
+                        <td mat-cell *matCellDef="let row">
+                            @if (isAprobada(row.estatus)) {
+                            <span class="status-badge status-badge--aprobada">
+                                <span class="material-symbols-outlined text-[16px] mr-1"
+                                    aria-hidden="true">check_circle</span>
+                                {{ row.estatus }}
+                            </span>
+                            } @else {
+                            <span class="status-badge status-badge--cancelada">
+                                <span class="material-symbols-outlined text-[16px] mr-1"
+                                    aria-hidden="true">cancel</span>
+                                {{ row.estatus }}
+                            </span>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <!-- Acciones column -->
+                    <ng-container matColumnDef="acciones">
+                        <th mat-header-cell *matHeaderCellDef class="text-right">Acciones</th>
+                        <td mat-cell *matCellDef="let row" class="text-right">
+                            @if (isAprobada(row.estatus)) {
+                            <button (click)="cancelTrnx(row)"
+                                class="text-error hover:bg-error/10 px-sm py-1.5 rounded-lg transition-all font-label-caps text-label-caps cursor-pointer">
+                                Cancelar
+                            </button>
+                            } @else {
+                            <button
+                                class="text-outline opacity-40 cursor-not-allowed px-sm py-1.5 font-label-caps text-label-caps"
+                                disabled>
+                                Cancelar
+                            </button>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                        class="hover:bg-surface-container-lowest/50 transition-colors"></tr>
+
+                    <!-- Empty state -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td [attr.colspan]="displayedColumns.length"
+                            class="py-xl text-center text-on-surface-variant text-body-lg">
+                            No hay transacciones registradas.
+                        </td>
+                    </tr>
                 </table>
             </div>
 
-            <!-- Pagination Footer -->
-            <div
-                class="px-md py-sm bg-surface-container-low flex justify-between items-center border-t border-outline-variant">
-                <div class="flex items-center gap-sm">
-                    <label class="text-on-surface-variant font-body-sm text-body-sm"
-                        for="rows-per-page">Mostrar:</label>
-                    <select
-                        class="bg-white border border-outline-variant rounded px-xs py-1 text-body-sm outline-none cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary/20"
-                        id="rows-per-page">
-                        <option value="10">10</option>
-                        <option selected value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-xs" role="navigation" aria-label="Paginación de transacciones">
-                    <button
-                        class="p-1 hover:bg-surface-container rounded-full transition-colors text-outline flex items-center justify-center cursor-pointer"
-                        aria-label="Página anterior">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chevron_left</span>
-                    </button>
-                    <div class="flex gap-1">
-                        <button
-                            class="w-8 h-8 flex items-center justify-center bg-primary text-on-primary rounded font-label-caps text-label-caps cursor-pointer"
-                            aria-current="page">
-                            1
-                        </button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded font-label-caps text-label-caps cursor-pointer">
-                            2
-                        </button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded font-label-caps text-label-caps cursor-pointer">
-                            3
-                        </button>
-                    </div>
-                    <button
-                        class="p-1 hover:bg-surface-container rounded-full transition-colors text-outline flex items-center justify-center cursor-pointer"
-                        aria-label="Siguiente página">
-                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">chevron_right</span>
-                    </button>
-                </div>
-            </div>
+            <mat-paginator [length]="totalElementos" [pageSize]="pageSize()" [pageSizeOptions]="[5, 10, 25, 50]"
+                [pageIndex]="page()" (page)="onPageChange($event)" aria-label="Paginación de transacciones" />
+            }
         </div>
     </section>
 </main>
-
-<!-- Floating Toast Notification -->
-<div class="fixed bottom-lg right-lg z-[100] animate-bounce-in" id="toast" role="alert" aria-live="polite">
-    <div class="bg-white border-l-4 border-secondary shadow-xl rounded-lg p-md flex items-start gap-md max-w-sm">
-        <div
-            class="flex-shrink-0 w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center text-secondary">
-            <span class="material-symbols-outlined fill" aria-hidden="true">check_circle</span>
-        </div>
-        <div class="flex-grow">
-            <h4 class="font-headline-md text-headline-md text-on-surface font-bold">Transacción Aprobada</h4>
-            <div class="mt-base flex flex-col font-body-sm text-body-sm text-on-surface-variant">
-                <span class="font-data-mono text-[13px]">ID: 2376</span>
-                <span class="font-data-mono text-[13px]">Referencia: 262737</span>
-            </div>
-        </div>
-        <button class="text-outline hover:text-on-surface transition-colors cursor-pointer"
-            onclick="document.getElementById('toast').remove()" aria-label="Cerrar notificación">
-            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
-        </button>
-    </div>
-</div>
