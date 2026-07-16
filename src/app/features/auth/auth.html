@@ -1,0 +1,144 @@
+<div class="min-h-screen flex items-center justify-center bg-linear-to-br from-background to-surface-container-high p-gutter">
+  <main class="w-full max-w-[460px]" aria-label="Formulario de inicio de sesión">
+    <div class="bg-white rounded-xl shadow-xl border border-outline/20 overflow-hidden flex flex-col p-xl transition-shadow duration-300 hover:shadow-2xl">
+
+      <!-- Card Header -->
+      <div class="flex flex-col items-center text-center mb-md">
+        <div class="mb-sm">
+          <div class="bg-primary/10 text-primary p-3.5 rounded-xl inline-flex items-center justify-center ring-4 ring-primary/5">
+            <span class="material-symbols-outlined text-[32px]" aria-hidden="true">shield</span>
+          </div>
+        </div>
+        <h1 class="text-headline-lg font-headline-lg text-on-surface mb-2 tracking-tight">
+          Iniciar Sesión
+        </h1>
+        <p class="text-body-lg text-on-surface-variant font-medium opacity-90">
+          Plataforma de Transacciones
+        </p>
+        <p class="text-body-sm text-on-surface-variant/70 mt-1">
+          Ingresa tus credenciales para acceder de forma segura
+        </p>
+      </div>
+
+      <!-- Card Body / Form -->
+      <div class="mt-xs">
+        <form
+          [formGroup]="loginForm"
+          (ngSubmit)="onSubmit()"
+          class="space-y-sm"
+          id="loginForm"
+          novalidate
+        >
+          <!-- Usuario Field -->
+          <div class="space-y-2">
+            <label
+              class="text-label-caps font-label-caps text-on-surface-variant/90 block font-medium"
+              for="username"
+            >
+              Usuario
+            </label>
+            <div
+              class="relative flex items-center bg-surface-container-low border rounded-lg transition-all"
+              [class]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched
+                ? 'border-error focus-within:border-error focus-within:ring-2 focus-within:ring-error/20'
+                : 'border-outline-variant focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20'"
+            >
+              <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60" aria-hidden="true">person</span>
+              <input
+                class="w-full bg-transparent border-none py-3.5 pl-11 pr-4 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
+                id="username"
+                formControlName="username"
+                placeholder="Ingresa tu usuario"
+                type="text"
+                autocomplete="username"
+                aria-required="true"
+                [attr.aria-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+                aria-describedby="username-error"
+              />
+            </div>
+            @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+              <p class="text-body-sm text-error flex items-center gap-1 mt-1" id="username-error" role="alert">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">error</span>
+                El usuario es requerido
+              </p>
+            }
+          </div>
+
+          <!-- Contraseña Field -->
+          <div class="space-y-2">
+            <label
+              class="text-label-caps font-label-caps text-on-surface-variant/90 block font-medium"
+              for="password"
+            >
+              Contraseña
+            </label>
+            <div
+              class="relative flex items-center bg-surface-container-low border rounded-lg transition-all"
+              [class]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+                ? 'border-error focus-within:border-error focus-within:ring-2 focus-within:ring-error/20'
+                : 'border-outline-variant focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20'"
+            >
+              <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px] opacity-60" aria-hidden="true">lock</span>
+              <input
+                class="w-full bg-transparent border-none py-3.5 pl-11 pr-12 focus:outline-hidden text-on-surface text-body-lg placeholder:text-on-surface-variant/40"
+                id="password"
+                formControlName="password"
+                placeholder="••••••••"
+                type="password"
+                autocomplete="current-password"
+                aria-required="true"
+                [attr.aria-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                aria-describedby="password-error"
+              />
+              <button
+                aria-label="Mostrar u ocultar contraseña"
+                class="absolute right-3 p-1.5 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant/60 hover:text-on-surface-variant flex items-center justify-center cursor-pointer"
+                (click)="togglePassword()"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-[20px]" id="passwordIcon" aria-hidden="true">visibility</span>
+              </button>
+            </div>
+            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+              <p class="text-body-sm text-error flex items-center gap-1 mt-1" id="password-error" role="alert">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">error</span>
+                La contraseña es requerida
+              </p>
+            }
+          </div>
+
+          <!-- API Error Message -->
+          @if (errorMessage()) {
+            <div
+              class="flex items-start gap-xs text-error py-3 px-3 bg-error/8 rounded-lg border border-error/15"
+              role="alert"
+              aria-live="assertive"
+            >
+              <span class="material-symbols-outlined text-[20px] mt-0.5 shrink-0" aria-hidden="true">error</span>
+              <span class="text-body-sm font-medium">{{ errorMessage() }}</span>
+            </div>
+          }
+
+          <!-- Submit Button -->
+          <div class="pt-4">
+            <button
+              class="w-full bg-primary text-on-primary text-headline-md font-semibold py-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2 shadow-lg shadow-primary/10 cursor-pointer
+                     enabled:hover:bg-primary/90 enabled:hover:shadow-xl enabled:hover:shadow-primary/20 enabled:active:scale-[0.98]
+                     disabled:opacity-60 disabled:cursor-not-allowed"
+              type="submit"
+              [disabled]="loginForm.invalid || loading()"
+              [attr.aria-busy]="loading()"
+            >
+              @if (loading()) {
+                <span class="material-symbols-outlined text-[20px] animate-spin" aria-hidden="true">progress_activity</span>
+                Ingresando...
+              } @else {
+                Ingresar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
